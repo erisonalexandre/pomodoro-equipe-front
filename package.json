@@ -6,10 +6,11 @@
   "private": true,
   "scripts": {
     "dev": "nuxt",
-    "build": "npm run dev && nuxt build",
+    "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "test": "jest"
+    "test": "jest",
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
