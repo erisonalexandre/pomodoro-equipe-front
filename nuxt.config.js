@@ -58,7 +58,7 @@ export default {
   },
   proxy: {
     '/api': {
-      target: 'http://pomodoro.erison',
+      target: 'https://pomodoro-back.herokuapp.com',
       pathRewrite: {
         '^/api' : '/'
       }
@@ -69,7 +69,7 @@ export default {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
-    baseURL: 'http://pomodoro.erison/api/'
+    baseURL: 'https://pomodoro-back.herokuapp.com/api/'
   },
   router: {
     middleware: ['auth']
