@@ -47,13 +47,47 @@ export default {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
-    '@nuxtjs/axios',
+    '@nuxtjs/auth',
+    '@nuxtjs/proxy',
   ],
+  pwa: {
+    manifest: {
+      name: 'My Awesome App',
+      "permissions": [ "audio" ],
+    }
+  },
+  proxy: {
+    '/api': {
+      target: 'http://pomodoro.erison',
+      pathRewrite: {
+        '^/api' : '/'
+      }
+    }
+  },
   /*
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
+    baseURL: 'http://pomodoro.erison/api/'
+  },
+  router: {
+    middleware: ['auth']
+  },
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/auth/login', method: 'post', propertyName: 'token' },
+          logout: { url: '/auth/logout', method: 'post' },
+          user: { url: '/auth/user', method: 'get', propertyName: 'user' }
+        },
+        tokenRequired: true,
+        tokenType: 'bearer',
+        globalToken: true,
+        autoFetchUser: true
+      }
+    }
   },
   /*
   ** Build configuration

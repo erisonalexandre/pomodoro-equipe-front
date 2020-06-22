@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueFire from 'vuefire'
 import firebase from 'firebase'
+import localforage from "localforage";
 
 Vue.use(VueFire)
 
@@ -20,9 +21,7 @@ if (!firebase.apps.length) {
 }
 
 var service = function () {
-  console.log('ast')
   if ('serviceWorker' in navigator) {
-    console.log('navigator')
     navigator.serviceWorker.register('./firebase-messaging-sw.js')
       .then(registration => {
         const messaging = firebase.messaging()
@@ -44,8 +43,19 @@ var service = function () {
           .then(() => {
             getToken()
           })
-        messaging.onMessage((payload) => {
-          console.log('Message received. ', payload);
+        messaging.onMessage(function({data}) {
+          localforage.setDriver([
+            localforage.INDEXEDDB,
+            localforage.WEBSQL,
+            localforage.LOCALSTORAGE
+          ]).then(function() {
+            localforage.getItem('user-id').then(function(readValue) {
+              if (data.user === readValue) {
+                let audio = new Audio('goes-without-saying.mp3')
+                audio.play()
+              }
+            })
+          })
         });
       })
       .catch(err => console.warn('Erro', err))

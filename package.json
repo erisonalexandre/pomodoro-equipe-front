@@ -12,14 +12,18 @@
     "test": "jest"
   },
   "dependencies": {
+    "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.10.3",
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/onesignal": "^3.0.0-beta.16",
+    "@nuxtjs/proxy": "^2.0.0",
     "@nuxtjs/pwa": "^3.0.0-0",
     "bootstrap": "^4.1.3",
     "bootstrap-vue": "^2.0.0",
     "firebase": "^4.5.2",
     "laravel-echo": "^1.8.0",
+    "localforage": "^1.7.4",
+    "moment": "^2.26.0",
     "nuxt": "^2.0.0",
     "pusher-js": "^6.0.3",
     "vue-pusher": "^1.0.0",
@@ -29,6 +33,8 @@
     "@vue/test-utils": "^1.0.0-beta.27",
     "babel-jest": "^24.1.0",
     "jest": "^24.1.0",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^8.0.2",
     "vue-jest": "^4.0.0-0"
   }
 }
