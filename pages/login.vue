@@ -36,7 +36,7 @@
     methods: {
       async userLogin() {
         try {
-          let response = await this.$auth.loginWith('local', { data: this.login })
+          let response = await this.$auth.loginWith('laravelJWT', { data: this.login })
           localforage.setDriver([
             localforage.INDEXEDDB,
             localforage.WEBSQL,
@@ -48,7 +48,7 @@
           messaging.getToken()
             .then(currentToken => {
               if (currentToken) {
-                this.$axios.post('register-user-group', {user: this.$auth.user, token: currentToken})
+                this.$axios.post('register-user-group', {user: this.$auth.user.user, token: currentToken})
               }
             });
 

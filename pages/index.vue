@@ -3,8 +3,19 @@
     <div v-show="load">
       <loading></loading>
     </div>
-    <div>
-      <b-button to="/usuarios">Usuarios</b-button>
+    <div style="width:100%">
+      breaks
+      <div class="d-flex text-center">
+        <div v-for="(item, index) in breaks" class="px-3" :class="[{'bg-success': breakAtual === index}]">
+          {{item}}
+        </div>
+      </div>
+      timers
+      <div class="d-flex text-center">
+        <div v-for="(item, index) in timers" :class="[{'bg-success': timerAtual === index}]">
+          {{item}}
+        </div>
+      </div>
     </div>
     <client-only>
       <div v-if="breakIniciado">
@@ -24,53 +35,53 @@
           </div>
         </div>
       </div>
-    </client-only>
-    <div v-if="!breakIniciado">
-      <h1 class="subtitle">
-        POMODORO
-      </h1>
-      <h1 class="title">
-        {{ tempoRestante }}
-      </h1>
-      <b-form-checkbox
-        id="auto-break"
-        v-model="autoBreak"
-        name="auto-break"
-        @input="salvar"
-      >
-        AUTO BREAK
-      </b-form-checkbox>
-      <div class="links">
-        <button
-          class="button--green"
-          @click="pausar"
-          v-if="!pausado && (timerIniciado || breakIniciado)"
+      <div v-if="!breakIniciado">
+        <h1 class="subtitle">
+          POMODORO
+        </h1>
+        <h1 class="title">
+          {{ tempoRestante }}
+        </h1>
+        <b-form-checkbox
+          id="auto-break"
+          v-model="autoBreak"
+          name="auto-break"
+          @input="salvar"
         >
-          PAUSAR
-        </button>
-        <button
-          class="button--green"
-          @click="voltar"
-          v-if="pausado"
-        >
-          VOLTAR
-        </button>
-        <button
-          v-if="!timerIniciado"
-          class="button--green"
-          @click="iniciarPomodoro"
-        >
-          INICIAR
-        </button>
-        <button
-          v-else
-          class="button--green"
-          @click="pararPomodoro"
-        >
-          REINICIAR
-        </button>
+          AUTO BREAK
+        </b-form-checkbox>
+        <div class="links">
+          <button
+            class="button--green"
+            @click="pausar"
+            v-if="!pausado && (timerIniciado || breakIniciado)"
+          >
+            PAUSAR
+          </button>
+          <button
+            class="button--green"
+            @click="voltar"
+            v-if="pausado"
+          >
+            VOLTAR
+          </button>
+          <button
+            v-if="!timerIniciado"
+            class="button--green"
+            @click="iniciarPomodoro"
+          >
+            INICIAR
+          </button>
+          <button
+            v-else
+            class="button--green"
+            @click="pararPomodoro"
+          >
+            REINICIAR
+          </button>
+        </div>
       </div>
-    </div>
+    </client-only>
   </div>
 </template>
 
@@ -128,12 +139,14 @@ export default {
       this.pausado = true
       this.segundosPausado = this.segundos
       this.pararRelogio()
+      this.$axios.post('pausar-pomodoro')
       this.salvar()
     },
     voltar () {
       this.pausado = false
       this.segundos = this.segundosPausado
       this.iniciarRelogio()
+      this.$axios.post('voltar-pomodoro')
       this.salvar()
     },
     salvar () {
@@ -155,6 +168,7 @@ export default {
       this.pausado = false
       this.timerIniciado = false
       this.breakIniciado = false
+      this.$axios.post('reiniciar-pomodoro')
       this.salvar()
     },
     atualizarRelogio () {
@@ -203,20 +217,11 @@ export default {
         }
       }
     },
-    carregarLocalStorage() {
-      let dataHoraInicio = localStorage.getItem('pomodoro-dataHoraInicio')
-      let timerIniciado = localStorage.getItem('pomodoro-timerIniciado')
-      let breakIniciado = localStorage.getItem('pomodoro-breakIniciado')
-      console.log(this.$auth.user)
-      if (dataHoraInicio && (timerIniciado || breakIniciado)) {
-        this.dataHoraInicio = this.$auth.user.pomodoro.data_hora_inicio
-        this.timerIniciado = this.$auth.user.pomodoro.timer_iniciado
-        this.breakIniciado = this.$auth.user.pomodoro.break_iniciado
-        this.autoBreak = this.$auth.user.pomodoro.auto_break
-        this.pausado = this.$auth.user.pomodoro.pausado
-        this.timerAtual = parseInt(localStorage.getItem('pomodoro-timerAtual'))
-        this.breakAtual = parseInt(localStorage.getItem('pomodoro-breakAtual'))
+    async carregarLocalStorage() {
+      await this.carregarDadosUsuarioLogado()
+      if (this.dataHoraInicio && (this.timerIniciado || this.breakIniciado)) {
         if ((this.breakIniciado || this.timerIniciado) && !this.pausado) {
+          console.log(this.dataHoraInicio)
           this.segundos = moment().diff(moment(this.dataHoraInicio, 'YYYY-MM-DD HH:mm:ss'), 'seconds')
           if (this.tempoPomodoro <= this.tempoRestanteMinutos) {
             this.proximoTempo()
@@ -228,6 +233,32 @@ export default {
         }
       }
     },
+    async carregarDadosUsuarioLogado() {
+      this.$auth.fetchUser()
+      this.$auth.refreshTokens()
+      console.log(this.$auth.user.user)
+      this.dataHoraInicio = this.$auth.user.user.pomodoro.data_hora_inicio
+      this.timerIniciado = this.$auth.user.user.pomodoro.timer_iniciado
+      this.breakIniciado = this.$auth.user.user.pomodoro.break_iniciado
+      this.autoBreak = this.$auth.user.user.pomodoro.auto_break
+      this.pausado = this.$auth.user.user.pomodoro.pausado
+      let atual = 0
+      this.timers = this.$auth.user.user.timers.map((timer, index) => {
+        if (timer.atual) {
+          atual = index
+        }
+        return timer.tempo
+      })
+      this.timerAtual = atual
+      atual = 0
+      this.breaks = this.$auth.user.user.breaks.map((timer, index) => {
+        if (timer.atual) {
+          atual = index
+        }
+        return timer.tempo
+      })
+      this.breakAtual = atual
+    },
     pararRelogio () {
       clearInterval(this.relogio)
       this.relogio = null
@@ -237,10 +268,14 @@ export default {
       this.relogio = setInterval(this.atualizarRelogio, 1000);
     }
   },
+  mounted() {
+    if (process.client) {
+      this.carregarLocalStorage()
+    }
+  },
   created() {
     if (process.client) {
       this.audio = new Audio('goes-without-saying.mp3')
-      this.carregarLocalStorage()
       this.load = false
       // chrome.permissions.request({
       //   permissions: ['tabs'],
@@ -262,7 +297,6 @@ export default {
 .container {
   margin: 0 auto;
   min-height: 100vh;
-  display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;

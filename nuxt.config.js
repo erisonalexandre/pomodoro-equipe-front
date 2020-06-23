@@ -46,7 +46,7 @@ export default {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
-    '@nuxtjs/auth',
+    '@nuxtjs/auth-next',
     '@nuxtjs/proxy',
   ],
   pwa: {
@@ -68,18 +68,27 @@ export default {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
-    baseURL: 'https://pomodoro-back.herokuapp.com/api/'
+    baseURL: 'https://pomodoro-back.herokuapp.com/'
   },
   router: {
     middleware: ['auth']
   },
   auth: {
     strategies: {
-      local: {
+      'laravelJWT': {
+        provider: 'laravel/jwt',
+        url: 'https://pomodoro-back.herokuapp.com/api',
         endpoints: {
           login: { url: '/auth/login', method: 'post', propertyName: 'token' },
           logout: { url: '/auth/logout', method: 'post' },
           user: { url: '/auth/user', method: 'get', propertyName: 'user' }
+        },
+        token: {
+          property: 'token',
+          maxAge: 60 * 60
+        },
+        refreshToken: {
+          maxAge: 20160 * 60
         },
         tokenRequired: true,
         tokenType: 'bearer',

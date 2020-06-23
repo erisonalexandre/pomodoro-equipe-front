@@ -1,5 +1,11 @@
 <template>
   <div class="background-escuro">
+    <b-navbar type="dark" variant="dark">
+      <b-navbar-nav>
+        <b-nav-item to="/">Pomodoro</b-nav-item>
+        <b-nav-item to="/usuarios">usuarios</b-nav-item>
+      </b-navbar-nav>
+    </b-navbar>
     <nuxt/>
   </div>
 </template>
