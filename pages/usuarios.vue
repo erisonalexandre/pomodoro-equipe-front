@@ -52,7 +52,11 @@
         }
         let minutos = Math.floor(pomodoro.segundos / 60)
         let segundos = pomodoro.segundos - (minutos * 60)
-        let stringMinutos = String((this.tempoPomodoro(pomodoro, breaks, timers) - minutos - 1)).padStart(2, '0')
+        let minutosRestantes = (this.tempoPomodoro(pomodoro, breaks, timers) - minutos - 1)
+        if (minutosRestantes < 0) {
+          this.getUsuarios()
+        }
+        let stringMinutos = String(minutosRestantes).padStart(2, '0')
         let stringSegundos = String((59 - segundos)).padStart(2, '0')
         return stringMinutos + ':' + stringSegundos
       },
