@@ -1,24 +1,20 @@
 <template>
-  <div class="container">
+  <div class="container pt-4">
     <div v-show="load">
       <loading></loading>
     </div>
-    <div style="width:100%">
-      breaks
-      <div class="d-flex text-center">
-        <div v-for="(item, index) in breaks" class="px-3" :class="[{'bg-success': breakAtual === index}]">
-          {{item}}
-        </div>
-      </div>
-      timers
-      <div class="d-flex text-center">
-        <div v-for="(item, index) in timers" :class="[{'bg-success': timerAtual === index}]">
-          {{item}}
-        </div>
-      </div>
-    </div>
     <client-only>
-      <div v-if="breakIniciado">
+      <div class="w-100 mb-2" v-show="breakIniciado || timerIniciado">
+        breaks
+        <div class="d-flex text-center justify-content-center">
+          <div class="d-flex border rounded">
+            <div v-for="(item, index) in breaks" class="px-3 rounded" :class="[{'bg-success': breakAtual === index}]">
+              {{item}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-show="breakIniciado">
         <div class="break d-flex justify-content-center align-items-center">
           <div>
             <h1>BREAK INICIADO</h1>
@@ -35,7 +31,7 @@
           </div>
         </div>
       </div>
-      <div v-if="!breakIniciado">
+      <div v-show="!breakIniciado">
         <h1 class="subtitle">
           POMODORO
         </h1>
@@ -235,8 +231,6 @@ export default {
     },
     async carregarDadosUsuarioLogado() {
       this.$auth.fetchUser()
-      this.$auth.refreshTokens()
-      console.log(this.$auth.user.user)
       this.dataHoraInicio = this.$auth.user.user.pomodoro.data_hora_inicio
       this.timerIniciado = this.$auth.user.user.pomodoro.timer_iniciado
       this.breakIniciado = this.$auth.user.user.pomodoro.break_iniciado

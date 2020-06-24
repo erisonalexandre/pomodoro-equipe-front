@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <b-table striped hover :items="usuarios" :fields="fields" :key="atualizar">
+    <b-table striped hover :items="usuarios" :fields="fields" :key="atualizar" :tbody-tr-class="rowClass">
       <template v-slot:cell(tempo)="data">
         <div>{{calcularTempoPomodoro(data)}}</div>
       </template>
@@ -35,18 +35,11 @@
         intervalo: null
       }
     },
-    // auto_break: false
-    // break_iniciado: false
-    // created_at: "2020-06-18T07:28:17.000000Z"
-    // data_hora_inicio: "2020-06-21 11:35:17"
-    // id: "eb801383-c1bf-417c-aefc-0cd9219ce69a"
-    // pausado: false
-    // segundos: 0
-    // segundos_pausado: null
-    // timer_iniciado: true
-    // updated_at: "2020-06-21T15:35:17.000000Z"
-    // user_id: "e4e8904f-7228-4983-923e-a8229b1605f7"
     methods: {
+      rowClass(item, type) {
+        if (!item || type !== 'row') return
+        if (item.pomodoro.break_iniciado) return 'table-break'
+      },
       tempoPomodoro(pomodoro, breaks, timers) {
         return pomodoro.timer_iniciado ? timers.find((item) => item.atual).tempo: breaks.find((item) => item.atual).tempo
       },
@@ -102,5 +95,9 @@
 
   .table-hover tbody tr:hover {
     color: #d2d2d2;
+  }
+  .table-break td{
+    background-color: #4be1aa;
+    color: black;
   }
 </style>
