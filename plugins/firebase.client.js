@@ -30,7 +30,6 @@ var service = function () {
           messaging.getToken()
             .then(currentToken => {
               if (currentToken) {
-                console.log('Enviar isso para um servidor:', currentToken)
                 return currentToken
               }
               console.warn('Nenhum is disponível, solicite permissão para gerar um')

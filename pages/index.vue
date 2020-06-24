@@ -44,7 +44,7 @@
           name="auto-break"
           @input="salvar"
         >
-          AUTO BREAK
+          BREAK MANUAL
         </b-form-checkbox>
         <div class="links">
           <button
