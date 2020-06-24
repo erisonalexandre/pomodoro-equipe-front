@@ -229,6 +229,15 @@ export default {
         }
       }
     },
+    ordernar(a, b) {
+      console.log(a, b)
+      if (a.ordem < b.ordem) {
+        return -1;
+      }
+      if (a.ordem > b.ordem) {
+        return 1;
+      }
+    },
     async carregarDadosUsuarioLogado() {
       this.$auth.fetchUser()
       this.dataHoraInicio = this.$auth.user.user.pomodoro.data_hora_inicio
@@ -237,7 +246,8 @@ export default {
       this.autoBreak = this.$auth.user.user.pomodoro.auto_break
       this.pausado = this.$auth.user.user.pomodoro.pausado
       let atual = 0
-      this.timers = this.$auth.user.user.timers.map((timer, index) => {
+      this.timers = Array.from(this.$auth.user.user.timers)
+      this.timers = this.timers.sort(this.ordernar).map((timer, index) => {
         if (timer.atual) {
           atual = index
         }
@@ -245,7 +255,8 @@ export default {
       })
       this.timerAtual = atual
       atual = 0
-      this.breaks = this.$auth.user.user.breaks.map((timer, index) => {
+      this.breaks = Array.from(this.$auth.user.user.breaks)
+      this.breaks = this.breaks.sort(this.ordernar).map((timer, index) => {
         if (timer.atual) {
           atual = index
         }
