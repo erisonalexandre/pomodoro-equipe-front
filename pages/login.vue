@@ -1,7 +1,6 @@
 <template>
   <div class="text-center" id="body">
     <form class="form-signin" @submit.prevent="userLogin">
-      loggin
       <h1 class="h3 mb-3 font-weight-normal">Pomodoro</h1>
       <label for="inputEmail" class="sr-only">Email</label>
       <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus v-model="login.email" />
