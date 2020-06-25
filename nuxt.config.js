@@ -46,7 +46,7 @@ export default {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
-    '@nuxtjs/auth-next',
+    '@nuxtjs/auth',
     '@nuxtjs/proxy',
   ],
   pwa: {
@@ -57,7 +57,7 @@ export default {
   },
   proxy: {
     '/api': {
-      target: 'https://pomodoro-back.herokuapp.com',
+      target: 'http://pomodoro.erison',
       pathRewrite: {
         '^/api' : '/'
       }
@@ -68,27 +68,18 @@ export default {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
-    baseURL: 'https://pomodoro-back.herokuapp.com/'
+    baseURL: 'http://pomodoro.erison'
   },
   router: {
     middleware: ['auth']
   },
   auth: {
     strategies: {
-      'laravelJWT': {
-        provider: 'laravel/jwt',
-        url: 'https://pomodoro-back.herokuapp.com/api',
+      local: {
         endpoints: {
-          login: { url: '/auth/login', method: 'post', propertyName: 'token' },
-          logout: { url: '/auth/logout', method: 'post' },
-          user: { url: '/auth/user', method: 'get', propertyName: 'user' }
-        },
-        token: {
-          property: 'token',
-          maxAge: 60 * 60
-        },
-        refreshToken: {
-          maxAge: 20160 * 60
+          login: { url: '/api/auth/login', method: 'post', propertyName: 'token' },
+          logout: { url: '/api/auth/logout', method: 'post' },
+          user: { url: '/api/auth/user', method: 'get', propertyName: 'user' }
         },
         tokenRequired: true,
         tokenType: 'bearer',

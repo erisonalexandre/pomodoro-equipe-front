@@ -12,15 +12,5 @@ firebase.initializeApp(config);
 const messaging = firebase.messaging()
 
 messaging.setBackgroundMessageHandler(function ({data}) {
-  localforage.setDriver([
-    localforage.INDEXEDDB,
-    localforage.WEBSQL,
-    localforage.LOCALSTORAGE
-  ]).then(function() {
-    localforage.getItem('user-id').then(function(readValue) {
-      if (data.user === readValue) {
-        return self.registration.showNotification(data.title, {body: data.body});
-      }
-    })
-  })
+  return self.registration.showNotification(data.title, {body: data.body});
 })

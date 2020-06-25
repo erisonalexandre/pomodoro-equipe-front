@@ -24,7 +24,7 @@
             <button
               v-if="pausado"
               class="button--green"
-              @click="iniciarRelogio"
+              @click="voltar"
             >
               INICIAR BREAK
             </button>
@@ -42,7 +42,7 @@
           id="auto-break"
           v-model="autoBreak"
           name="auto-break"
-          @input="salvar"
+          @input="alterarAutoBreak"
         >
           BREAK MANUAL
         </b-form-checkbox>
@@ -85,15 +85,16 @@
 import Logo from '~/components/Logo.vue'
 import Loading from '~/components/Loading.vue'
 import moment from 'moment'
+
 export default {
   components: {
     Logo,
     Loading
   },
-  data () {
+  data() {
     return {
-      timers: [ 45, 45, 45, 45],
-      breaks: [ 4, 4, 4, 10],
+      timers: [45, 45, 45, 45],
+      breaks: [4, 4, 4, 10],
       timerAtual: 0,
       breakAtual: 0,
       segundos: 0,
@@ -110,13 +111,13 @@ export default {
     }
   },
   computed: {
-    tempoPomodoro () {
-      return this.timerIniciado ? this.timers[this.timerAtual]: this.breaks[this.breakAtual]
+    tempoPomodoro() {
+      return this.timerIniciado ? this.timers[this.timerAtual] : this.breaks[this.breakAtual]
     },
-    tempoRestanteMinutos () {
+    tempoRestanteMinutos() {
       return Math.floor(this.segundos / 60)
     },
-    tempoRestante () {
+    tempoRestante() {
       if (!this.timerIniciado && !this.breakIniciado) {
         return 'Pomodoro não iniciado'
       }
@@ -125,30 +126,35 @@ export default {
       }
       let minutos = this.tempoRestanteMinutos
       let segundos = this.segundos - (minutos * 60)
-      let stringMinutos = String((this.tempoPomodoro - minutos - 1 )).padStart(2, '0')
+      let stringMinutos = String((this.tempoPomodoro - minutos - 1)).padStart(2, '0')
       let stringSegundos = String((59 - segundos)).padStart(2, '0')
-      return   stringMinutos + ':' + stringSegundos
+      return stringMinutos + ':' + stringSegundos
     }
   },
   methods: {
-    pausar () {
+    pausar() {
       this.pausado = true
       this.segundosPausado = this.segundos
       this.pararRelogio()
       this.$axios.post('pausar-pomodoro')
       this.salvar()
     },
-    voltar () {
+    voltar() {
       this.pausado = false
       this.segundos = this.segundosPausado
       this.iniciarRelogio()
       this.$axios.post('voltar-pomodoro')
       this.salvar()
     },
-    salvar () {
+    alterarAutoBreak() {
+      if (this.$auth.user.pomodoro.auto_break !== this.autoBreak) {
+        this.$axios.post('salvar-auto-break', {autoBreak: this.autoBreak})
+      }
+    },
+    salvar() {
       this.salvarLocalStorage(this.$data, true)
     },
-    iniciarPomodoro () {
+    iniciarPomodoro() {
       this.$axios.post('iniciar-pomodoro')
       this.dataHoraInicio = moment().format('YYYY-MM-DD HH:mm:ss')
       this.timerIniciado = true
@@ -159,7 +165,7 @@ export default {
       this.salvar()
       this.iniciarRelogio()
     },
-    pararPomodoro () {
+    pararPomodoro() {
       this.pararRelogio()
       this.pausado = false
       this.timerIniciado = false
@@ -167,10 +173,10 @@ export default {
       this.$axios.post('reiniciar-pomodoro')
       this.salvar()
     },
-    atualizarRelogio () {
+    atualizarRelogio() {
       this.segundos = this.segundos + 1;
       if (this.tempoPomodoro <= this.tempoRestanteMinutos) {
-        if(this.autoBreak) {
+        if (this.autoBreak) {
           this.pausado = true
           this.segundosPausado = 0
           this.pararRelogio()
@@ -180,7 +186,7 @@ export default {
         }
       }
     },
-    proximoTempo () {
+    proximoTempo() {
       if (this.timerIniciado) {
         this.dataHoraInicio = moment().format('YYYY-MM-DD HH:mm:ss')
         this.timerIniciado = false
@@ -188,7 +194,7 @@ export default {
         this.segundos = 0
         this.timerAtual = this.timerAtual + 1
         this.audio.play()
-        if(this.timers.length <= this.timerAtual) {
+        if (this.timers.length <= this.timerAtual) {
           this.timerAtual = 0
         }
       } else {
@@ -198,13 +204,13 @@ export default {
         this.breakIniciado = false
         this.segundos = 0
         this.breakAtual = this.breakAtual + 1
-        if(this.breaks.length <= this.breakAtual) {
+        if (this.breaks.length <= this.breakAtual) {
           this.breakAtual = 0
         }
       }
       this.salvar()
     },
-    salvarLocalStorage (itens, salvarObjeto = false) {
+    salvarLocalStorage(itens, salvarObjeto = false) {
       if (salvarObjeto) {
         if (typeof itens === 'object' && itens !== null) {
           itens = Object.entries(itens).forEach((item, index) => {
@@ -217,7 +223,6 @@ export default {
       await this.carregarDadosUsuarioLogado()
       if (this.dataHoraInicio && (this.timerIniciado || this.breakIniciado)) {
         if ((this.breakIniciado || this.timerIniciado) && !this.pausado) {
-          console.log(this.dataHoraInicio)
           this.segundos = moment().diff(moment(this.dataHoraInicio, 'YYYY-MM-DD HH:mm:ss'), 'seconds')
           if (this.tempoPomodoro <= this.tempoRestanteMinutos) {
             this.proximoTempo()
@@ -230,7 +235,6 @@ export default {
       }
     },
     ordernar(a, b) {
-      console.log(a, b)
       if (a.ordem < b.ordem) {
         return -1;
       }
@@ -239,14 +243,14 @@ export default {
       }
     },
     async carregarDadosUsuarioLogado() {
-      this.$auth.fetchUser()
-      this.dataHoraInicio = this.$auth.user.user.pomodoro.data_hora_inicio
-      this.timerIniciado = this.$auth.user.user.pomodoro.timer_iniciado
-      this.breakIniciado = this.$auth.user.user.pomodoro.break_iniciado
-      this.autoBreak = this.$auth.user.user.pomodoro.auto_break
-      this.pausado = this.$auth.user.user.pomodoro.pausado
+      await this.$auth.fetchUser()
+      this.dataHoraInicio = this.$auth.user.pomodoro.data_hora_inicio
+      this.timerIniciado = this.$auth.user.pomodoro.timer_iniciado
+      this.breakIniciado = this.$auth.user.pomodoro.break_iniciado
+      this.autoBreak = this.$auth.user.pomodoro.auto_break
+      this.pausado = this.$auth.user.pomodoro.pausado
       let atual = 0
-      this.timers = Array.from(this.$auth.user.user.timers)
+      this.timers = Array.from(this.$auth.user.timers)
       this.timers = this.timers.sort(this.ordernar).map((timer, index) => {
         if (timer.atual) {
           atual = index
@@ -255,7 +259,8 @@ export default {
       })
       this.timerAtual = atual
       atual = 0
-      this.breaks = Array.from(this.$auth.user.user.breaks)
+
+      this.breaks = Array.from(this.$auth.user.breaks)
       this.breaks = this.breaks.sort(this.ordernar).map((timer, index) => {
         if (timer.atual) {
           atual = index
@@ -264,23 +269,22 @@ export default {
       })
       this.breakAtual = atual
     },
-    pararRelogio () {
+    pararRelogio() {
       clearInterval(this.relogio)
       this.relogio = null
     },
-    iniciarRelogio () {
+    iniciarRelogio() {
       this.pausado = false
       this.relogio = setInterval(this.atualizarRelogio, 1000);
-    }
+    },
   },
-  mounted() {
-    if (process.client) {
-      this.carregarLocalStorage()
-    }
+  beforeDestroy() {
+    clearInterval(this.relogio)
   },
   created() {
     if (process.client) {
       this.audio = new Audio('goes-without-saying.mp3')
+      this.carregarLocalStorage()
       this.load = false
       // chrome.permissions.request({
       //   permissions: ['tabs'],
@@ -310,7 +314,7 @@ export default {
 
 .title {
   font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
   font-weight: 300;
   font-size: 100px;
@@ -328,12 +332,16 @@ export default {
 .links {
   padding-top: 15px;
 }
+
 .break {
-  position:fixed;
-  width:100%;
+  position: fixed;
+  width: 100%;
   color: #fff;
-  left:0;right:0;top:0;bottom:0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
   background-color: #4c4d53c4;
-  z-index:9998;
+  z-index: 9998;
 }
 </style>

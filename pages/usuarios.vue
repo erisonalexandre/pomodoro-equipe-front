@@ -53,8 +53,13 @@
         let minutos = Math.floor(pomodoro.segundos / 60)
         let segundos = pomodoro.segundos - (minutos * 60)
         let minutosRestantes = (this.tempoPomodoro(pomodoro, breaks, timers) - minutos - 1)
-        if (minutosRestantes < 0) {
-          this.getUsuarios()
+        if (minutosRestantes === 0 && segundos === 59) {
+          if(typeof window.LIT !== 'undefined') {
+            clearTimeout(window.LIT);
+          }
+          window.LIT = setTimeout(() => {
+            this.getUsuarios()
+          }, 1000);
         }
         let stringMinutos = String(minutosRestantes).padStart(2, '0')
         let stringSegundos = String((59 - segundos)).padStart(2, '0')
@@ -82,9 +87,9 @@
       this.getUsuarios()
       this.atualizarTabela()
     },
-    beforeDestroy() {
-      clearInterval(this.intervalo)
-    }
+              beforeDestroy() {
+                clearInterval(this.intervalo)
+              }
   }
 </script>
 

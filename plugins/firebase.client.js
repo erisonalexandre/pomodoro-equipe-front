@@ -43,18 +43,8 @@ var service = function () {
             getToken()
           })
         messaging.onMessage(function({data}) {
-          localforage.setDriver([
-            localforage.INDEXEDDB,
-            localforage.WEBSQL,
-            localforage.LOCALSTORAGE
-          ]).then(function() {
-            localforage.getItem('user-id').then(function(readValue) {
-              if (data.user === readValue) {
-                let audio = new Audio('goes-without-saying.mp3')
-                audio.play()
-              }
-            })
-          })
+          let audio = new Audio('goes-without-saying.mp3')
+          audio.play()
         });
       })
       .catch(err => console.warn('Erro', err))

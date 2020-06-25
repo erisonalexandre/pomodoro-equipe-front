@@ -4,6 +4,7 @@
       <b-navbar-nav>
         <b-nav-item to="/">Pomodoro</b-nav-item>
         <b-nav-item to="/usuarios">usuarios</b-nav-item>
+        <b-nav-item class="float-right" @click="logout">sair</b-nav-item>
       </b-navbar-nav>
     </b-navbar>
     <nuxt/>
@@ -20,6 +21,10 @@ export default {
     }
   },
   methods: {
+    logout() {
+      this.$auth.logout()
+      this.$auth.logout()
+    },
     createPusher() {
       // this.pusher = new Pusher(process.env.PUSHER_API_KEY, {
       //   cluster: 'us2'

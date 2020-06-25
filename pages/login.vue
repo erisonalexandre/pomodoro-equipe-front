@@ -1,6 +1,7 @@
 <template>
   <div class="text-center" id="body">
     <form class="form-signin" @submit.prevent="userLogin">
+      loggin
       <h1 class="h3 mb-3 font-weight-normal">Pomodoro</h1>
       <label for="inputEmail" class="sr-only">Email</label>
       <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus v-model="login.email" />
@@ -28,7 +29,7 @@
     methods: {
       async userLogin() {
         try {
-          let response = await this.$auth.loginWith('laravelJWT', { data: this.login })
+          let response = await this.$auth.loginWith('local', { data: this.login })
           localforage.setDriver([
             localforage.INDEXEDDB,
             localforage.WEBSQL,
@@ -40,13 +41,22 @@
           messaging.getToken()
             .then(currentToken => {
               if (currentToken) {
-                this.$axios.post('register-user-group', {user: this.$auth.user.user, token: currentToken})
+                this.$axios.post('register-user-group', {user: this.$auth.user, token: currentToken})
               }
             });
 
           this.$router.replace('/')
         } catch (err) {
-          console.log(err)
+           if (err.response?.data?.error && err.response.data.error === 'Unauthorized') {
+             this.$bvToast.toast('Email ou senha incorretos', {
+               title: 'Não autorizado',
+               toaster: 'b-toaster-top-center',
+               variant: 'danger',
+               solid: true
+             })
+           }
+
+          console.log(err.response.data.error)
         }
       }
     }
@@ -55,7 +65,7 @@
 
 <style scoped>
   #body {
-    height: 100vh;
+    min-height: 100vh;
   }
 
   #body {
