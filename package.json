@@ -26,7 +26,7 @@
     "laravel-echo": "^1.8.0",
     "localforage": "^1.7.4",
     "moment": "^2.26.0",
-    "nuxt": "^2.0.0",
+    "nuxt": "^3.4.3",
     "pusher-js": "^6.0.3",
     "vue-pusher": "^1.0.0",
     "vuefire": "^1.4.4"
